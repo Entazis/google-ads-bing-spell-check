@@ -115,15 +115,15 @@ function BingSpellChecker(config) {
 
     if(options.text.trim()) {
       if(options.text === this.previousText) {
-        Logger.log('INFO: Using previous response.');
+        //Logger.log('INFO: Using previous response.');
         return this.previousResult;
       }
       if(this.cache) {
         var words = options.text.split(/ +/);
         for(var i in words) {
-          Logger.log('INFO: checking cache: '+words[i]);
+          //Logger.log('INFO: checking cache: '+words[i]);
           if(this.cache.incorrect[words[i]]) {
-            Logger.log('INFO: Using cached response.');
+            //Logger.log('INFO: Using cached response.');
             return [{"offset":1,"token":words[i],"type":"cacheHit","suggestions":[]}];
           }
         }
@@ -146,8 +146,8 @@ function BingSpellChecker(config) {
       if(this.timeOfLastCall) {
         var now = Date.now();
         if(now - this.timeOfLastCall < this.delay) {
-          Logger.log(Utilities.formatString('INFO: Sleeping for %s milliseconds',
-              this.delay - (now - this.timeOfLastCall)));
+          // Logger.log(Utilities.formatString('INFO: Sleeping for %s milliseconds',
+          //     this.delay - (now - this.timeOfLastCall)));
           Utilities.sleep(this.delay - (now - this.timeOfLastCall));
         }
       }
@@ -176,8 +176,9 @@ function BingSpellChecker(config) {
   // toCheck : the phrase to spellcheck
   // returns true if there are words misspelled, false otherwise.
   this.hasSpellingIssues = function(toCheck) {
+    Logger.log('checking: ' + toCheck);
     var issues = this.checkSpelling({ text : toCheck });
-    Logger.log('issues found: ' +issues);
+    Logger.log('issues found: ' + JSON.stringify(issues));
     return (issues.length > 0);
   };
 
