@@ -2,25 +2,19 @@ var CHECKED_LABEL_NAME = "Spellchecked";
 var ISSUE_LABEL_NAME = "Spelling Issue";
 
 function main() {
-  Logger.log('debug: creating bing spell checker object');
   var bing = new BingSpellChecker({
     key : 'xxxxxxxxxxxxxxxx',
     toIgnore : ['adwords','adgroup','russ'],
     enableCache : true
   });
-  Logger.log('debug: getting mccapp acounts');
   var accountIter = MccApp.accounts().get();
   while(accountIter.hasNext()) {
-    Logger.log('debug: selecting account');
     MccApp.select(accountIter.next());
-    Logger.log('debug: checking ads');
     checkAds(bing);
     if(bing.hitQuota) {
-      Logger.log('debug: bing quota hit');
       break;
     }
   }
-  Logger.log('debug: saving cache');
   bing.saveCache();
 }
 
@@ -28,7 +22,6 @@ function checkAds(bing) {
   createLabelIfNeeded(CHECKED_LABEL_NAME,'Indicates an entity was spell checked','#00ff00' /*green*/);
   createLabelIfNeeded(ISSUE_LABEL_NAME,'Indicates an entity has a spelling issue','#ff0000' /*red*/);
 
-  Logger.log('debug: creating ad iter');
   var adIter = AdWordsApp.ads()
       .withCondition("Status = ENABLED")
       .withCondition(Utilities.formatString("LabelNames CONTAINS_NONE ['%s','%s']",
@@ -53,7 +46,6 @@ function checkAds(bing) {
       ].join(' ');
     }
     try {
-      Logger.log('debug: checking text: '+textToCheck);
       var hasSpellingIssues = bing.hasSpellingIssues(textToCheck);
       if(hasSpellingIssues) {
         ad.applyLabel(ISSUE_LABEL_NAME);
@@ -78,7 +70,6 @@ function checkAds(bing) {
 //This is a helper function to create the label if it does not already exist
 function createLabelIfNeeded(name,description,color) {
   if(!AdWordsApp.labels().withCondition("Name = '"+name+"'").get().hasNext()) {
-    Logger.log('debug: creating label: ' + name);
     AdWordsApp.createLabel(name,description,color);
   }
 }
@@ -109,8 +100,6 @@ function BingSpellChecker(config) {
   this.delay = (config.delay) ? config.delay : 60000/7;
   this.timeOfLastCall = null;
   this.hitQuota = false;
-
-  Logger.log('debug: BingSpellChecker initialization');
 
   // Given a set of options, this function calls the API to check the spelling
   // options:
@@ -162,13 +151,7 @@ function BingSpellChecker(config) {
           Utilities.sleep(this.delay - (now - this.timeOfLastCall));
         }
       }
-      Logger.log('debug: fetching url');
-      Logger.log(url);
-      Logger.log(config);
       var resp = UrlFetchApp.fetch(url, config);
-      Logger.log(resp.getResponseCode());
-      Logger.log(resp.getAllHeaders());
-      Logger.log(resp);
       this.timeOfLastCall = Date.now();
       if(resp.getResponseCode() !== 200) {
         if(resp.getResponseCode() === 403) {
@@ -201,12 +184,9 @@ function BingSpellChecker(config) {
   // Loads the list of misspelled words from Google Drive.
   // set config.enableCache to true to enable.
   this.loadCache = function() {
-    Logger.log('debug: loading cache');
     var fileIter = DriveApp.getFilesByName(this.CACHE_FILE_NAME);
     if(fileIter.hasNext()) {
       this.cache = JSON.parse(fileIter.next().getBlob().getDataAsString());
-      Logger.log('debug: this.cache:');
-      Logger.log(this.cache);
     } else {
       this.cache = { incorrect : {} };
     }
