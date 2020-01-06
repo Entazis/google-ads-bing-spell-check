@@ -199,9 +199,12 @@ function BingSpellChecker(config) {
   // Loads the list of misspelled words from Google Drive.
   // set config.enableCache to true to enable.
   this.loadCache = function() {
+    Logger.log('debug: loading cache');
     var fileIter = DriveApp.getFilesByName(this.CACHE_FILE_NAME);
     if(fileIter.hasNext()) {
       this.cache = JSON.parse(fileIter.next().getBlob().getDataAsString());
+      Logger.log('debug: this.cache:');
+      Logger.log(this.cache);
     } else {
       this.cache = { incorrect : {} };
     }
