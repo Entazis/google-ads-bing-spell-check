@@ -176,9 +176,10 @@ function BingSpellChecker(config) {
   // toCheck : the phrase to spellcheck
   // returns true if there are words misspelled, false otherwise.
   this.hasSpellingIssues = function(toCheck) {
-    Logger.log('checking: ' + toCheck);
-    var issues = this.checkSpelling({ text : toCheck });
-    Logger.log('issues found: ' + JSON.stringify(issues));
+    var issues = JSON.stringify(this.checkSpelling({ text : toCheck }));
+    if (issues !== '') {
+      Logger.log('Checked text: %s \n Issues found: %s', toCheck, JSON.stringify(issues));
+    }
     return (issues.length > 0);
   };
 
