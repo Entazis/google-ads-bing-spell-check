@@ -99,7 +99,7 @@ function createLabelIfNeeded(name,description,color) {
  * var hasSpellingIssues = bing.hasSpellingIssues('this is a speling error');
  ******************************************/
 function BingSpellChecker(config) {
-  this.BASE_URL = 'https://api.cognitive.microsoft.com/bing/v5.0/spellcheck';
+  this.BASE_URL = 'https://api.cognitive.microsoft.com/bing/v7.0/spellcheck';
   this.CACHE_FILE_NAME = 'spellcheck_cache.json';
   this.key = config.key;
   this.toIgnore = config.toIgnore;
@@ -163,10 +163,12 @@ function BingSpellChecker(config) {
         }
       }
       Logger.log('debug: fetching url');
+      Logger.log(url);
       Logger.log(config);
       var resp = UrlFetchApp.fetch(url, config);
       Logger.log(resp.getResponseCode());
-      Logger.log(resp.getContentText());
+      Logger.log(resp.getAllHeaders());
+      Logger.log(resp);
       this.timeOfLastCall = Date.now();
       if(resp.getResponseCode() !== 200) {
         if(resp.getResponseCode() === 403) {
