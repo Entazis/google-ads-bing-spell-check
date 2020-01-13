@@ -231,10 +231,22 @@ function sendSpellCheckReportEmail() {
   var sheet = openSpreadsheetAndGetSheet('', '');
   var cells = sheet.getDataRange().getValues();
 
-  //TODO: count unique issues
-  var uniqueIssuesCnt = Object.keys(cells);
+  var uniqueIssuesCnt = countDistinctValues(sheet.getSheetValues(2, 5, sheet.getLastRow(), 1));
 
   MailApp.sendEmail('',
       'Bing Spell Checker - report',
       Utilities.formatString('Spell check was successful!\n\nSpelling issues were logged here: ...\nNumber of unique issues: %s', uniqueIssuesCnt));
+}
+
+function countDistinctValues(values) {
+  values = values.filter(function(value) {
+    return !(JSON.stringify(value) === '[""]');
+  });
+
+  var counts = {};
+  for (var i = 0; i < values.length; i++) {
+    counts[values[i]] = 1 + (counts[values[i]] || 0);
+  }
+
+  return Object.keys(counts).length;
 }
