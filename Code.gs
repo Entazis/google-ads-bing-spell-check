@@ -7,6 +7,9 @@ function main() {
     toIgnore : ['adwords','adgroup','russ'],
     enableCache : true
   });
+
+  openSpreadsheet();
+
   var accountIter = MccApp.accounts().get();
   while(accountIter.hasNext()) {
     MccApp.select(accountIter.next());
@@ -46,9 +49,10 @@ function checkAds(bing) {
       ].join(' ');
     }
     try {
-      var hasSpellingIssues = bing.hasSpellingIssues(textToCheck);
-      if(hasSpellingIssues) {
+      var issues = bing.getSpellingIssues(textToCheck);
+      if(issues.length > 0) {
         ad.applyLabel(ISSUE_LABEL_NAME);
+        appendARow(AdWordsApp.currentAccount().getName(), ad.getCampaign().getName(), ad.getAdGroup().getName(), ad.getId(), JSON.stringify(issues));
       } else {
         ad.applyLabel(CHECKED_LABEL_NAME);
       }
@@ -172,15 +176,15 @@ function BingSpellChecker(config) {
     }
   };
 
-  // Returns true if there are spelling mistakes in the text toCheck
+  // Returns the spelling issues if there are spelling mistakes in the text toCheck
   // toCheck : the phrase to spellcheck
-  // returns true if there are words misspelled, false otherwise.
-  this.hasSpellingIssues = function(toCheck) {
+  // returns array of objects if there are words misspelled, empty array otherwise.
+  this.getSpellingIssues = function(toCheck) {
     var issues = this.checkSpelling({ text : toCheck });
     if (issues.length > 0) {
       Logger.log('Checked text: %s \n Issues found: %s', toCheck, JSON.stringify(issues));
     }
-    return (issues.length > 0);
+    return issues;
   };
 
   // Loads the list of misspelled words from Google Drive.
@@ -207,4 +211,21 @@ function BingSpellChecker(config) {
       DriveApp.createFile(this.CACHE_FILE_NAME, JSON.stringify(this.cache));
     }
   }
+}
+
+function openSpreadsheet() {
+  var SPREADSHEET_URL = '';
+
+  var ss = SpreadsheetApp.openByUrl(SPREADSHEET_URL);
+  Logger.log("Using spreadsheet: %s", ss.getName());
+}
+
+function appendARow(accountName, campaignName, adGroupName, adId, issues) {
+  var SPREADSHEET_URL = '';
+  var SHEET_NAME = '';
+
+  var ss = SpreadsheetApp.openByUrl(SPREADSHEET_URL);
+  var sheet = ss.getSheetByName(SHEET_NAME);
+
+  sheet.appendRow([accountName, campaignName, adGroupName, adId, issues]);
 }
