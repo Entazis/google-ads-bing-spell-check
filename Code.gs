@@ -20,7 +20,7 @@ function main() {
     }
   }
 
-  sendSimpleTextEmail();
+  sendSpellCheckReportEmail();
 
   bing.saveCache();
 }
@@ -227,7 +227,7 @@ function appendARow(accountName, campaignName, adGroupName, adId, issues) {
   sheet.appendRow([accountName, campaignName, adGroupName, adId, issues]);
 }
 
-function sendSimpleTextEmail() {
+function sendSpellCheckReportEmail() {
   var sheet = openSpreadsheetAndGetSheet('', '');
   var cells = sheet.getDataRange().getValues();
 
