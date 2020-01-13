@@ -8,7 +8,8 @@ function main() {
     enableCache : true
   });
 
-  openSpreadsheet();
+  var sheet = openSpreadsheetAndGetSheet('', '');
+  Logger.log("Using sheet: %s", sheet.getName());
 
   var accountIter = MccApp.accounts().get();
   while(accountIter.hasNext()) {
@@ -18,6 +19,9 @@ function main() {
       break;
     }
   }
+
+  sendSimpleTextEmail();
+
   bing.saveCache();
 }
 
@@ -213,19 +217,24 @@ function BingSpellChecker(config) {
   }
 }
 
-function openSpreadsheet() {
-  var SPREADSHEET_URL = '';
-
-  var ss = SpreadsheetApp.openByUrl(SPREADSHEET_URL);
-  Logger.log("Using spreadsheet: %s", ss.getName());
+function openSpreadsheetAndGetSheet(url, sheetName) {
+  var ss = SpreadsheetApp.openByUrl(url);
+  return ss.getSheetByName(sheetName);
 }
 
 function appendARow(accountName, campaignName, adGroupName, adId, issues) {
-  var SPREADSHEET_URL = '';
-  var SHEET_NAME = '';
-
-  var ss = SpreadsheetApp.openByUrl(SPREADSHEET_URL);
-  var sheet = ss.getSheetByName(SHEET_NAME);
-
+  var sheet = openSpreadsheetAndGetSheet('', '');
   sheet.appendRow([accountName, campaignName, adGroupName, adId, issues]);
+}
+
+function sendSimpleTextEmail() {
+  var sheet = openSpreadsheetAndGetSheet('', '');
+  var cells = sheet.getDataRange().getValues();
+
+  //TODO: count unique issues
+  var uniqueIssuesCnt = Object.keys(cells);
+
+  MailApp.sendEmail('',
+      'Bing Spell Checker - report',
+      Utilities.formatString('Spell check was successful!\n\nSpelling issues were logged here: ...\nNumber of unique issues: %s', uniqueIssuesCnt));
 }
