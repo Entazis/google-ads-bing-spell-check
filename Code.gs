@@ -9,7 +9,7 @@ function main() {
   });
   //Optional parameters for filtering account names.
   //Leave blank to use filters. The matching is case insensitive.
-  var excludeAccountNameContains = ""; //Select which accounts to exclude. Leave blank to not exclude any accounts.
+  var excludeAccountNameContains = "- OLD"; //Select which accounts to exclude. Leave blank to not exclude any accounts.
   var includeAccountNameContains = ""; //Select which accounts to include. Leave blank to include all accounts.
 
   var sheet = openSpreadsheetAndGetSheet('', '');
