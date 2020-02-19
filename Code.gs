@@ -5,7 +5,7 @@ function main() {
   var bing = new BingSpellChecker({
     key : 'xxxxxxxxxxxxxxxx',
     toIgnore : ['adwords','adgroup','russ'],
-    enableCache : true
+    enableCache : false
   });
   //Optional parameters for filtering account names.
   //Leave blank to use filters. The matching is case insensitive.
