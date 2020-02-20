@@ -137,7 +137,7 @@ function BingSpellChecker(config) {
         var words = options.text.split(/ +/);
         for(var i in words) {
           //Logger.log('INFO: checking cache: '+words[i]);
-          if(this.cache.incorrect[words[i]]) {
+          if(this.cache && this.cache.incorrect[words[i]]) {
             //Logger.log('INFO: Using cached response.');
             return [{"offset":1,"token":words[i],"type":"cacheHit","suggestions":[]}];
           }
@@ -178,7 +178,9 @@ function BingSpellChecker(config) {
         this.previousText = options.text;
         this.previousResult = jsonResp.flaggedTokens;
         for(var i in jsonResp.flaggedTokens) {
-          this.cache.incorrect[jsonResp.flaggedTokens[i].token] = true;
+          if (this.cache) {
+            this.cache.incorrect[jsonResp.flaggedTokens[i].token] = true;
+          }
         }
         return jsonResp.flaggedTokens;
       }
