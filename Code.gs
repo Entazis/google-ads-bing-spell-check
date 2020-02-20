@@ -63,7 +63,15 @@ function checkAds(bing) {
       var issues = bing.getSpellingIssues(textToCheck);
       if(issues.length > 0) {
         ad.applyLabel(ISSUE_LABEL_NAME);
-        appendARow(AdWordsApp.currentAccount().getName(), ad.getCampaign().getName(), ad.getAdGroup().getName(), ad.getId(), JSON.stringify(issues));
+        var missSpellings = [];
+        var suggestions = [];
+
+        for (var i = 0; i < issues.length; i++) {
+          missSpellings.push(issues[i].token);
+          suggestions.push(issues[i].suggestions[0]["suggestion"]);
+        }
+
+        appendARow(AdWordsApp.currentAccount().getName(), ad.getCampaign().getName(), ad.getAdGroup().getName(), ad.getId(), missSpellings.join('\n'), suggestions.join('\n'));
       } else {
         ad.applyLabel(CHECKED_LABEL_NAME);
       }
@@ -231,9 +239,9 @@ function openSpreadsheetAndGetSheet(url, sheetName) {
   return ss.getSheetByName(sheetName);
 }
 
-function appendARow(accountName, campaignName, adGroupName, adId, issues) {
+function appendARow(accountName, campaignName, adGroupName, adId, issues, suggestions) {
   var sheet = openSpreadsheetAndGetSheet('', '');
-  sheet.appendRow([accountName, campaignName, adGroupName, adId, issues]);
+  sheet.appendRow([accountName, campaignName, adGroupName, adId, issues, suggestions]);
 }
 
 function sendSpellCheckReportEmail() {
