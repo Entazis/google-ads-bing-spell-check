@@ -12,7 +12,9 @@ function main() {
   var excludeAccountNameContains = "- OLD"; //Select which accounts to exclude. Leave blank to not exclude any accounts.
   var includeAccountNameContains = ""; //Select which accounts to include. Leave blank to include all accounts.
 
-  var sheet = openSpreadsheetAndGetSheet('', '');
+  var emailAddressesForSendingReportTo = [''];
+
+  var sheet = openSpreadsheetAndGetSheet('', 'Spelling Issues');
   Logger.log("Using sheet: %s", sheet.getName());
 
   var accountIter = MccApp.accounts()
@@ -27,7 +29,7 @@ function main() {
     }
   }
 
-  sendSpellCheckReportEmail();
+  sendSpellCheckReportEmail(emailAddressesForSendingReportTo);
 
   bing.saveCache();
 }
@@ -240,19 +242,19 @@ function openSpreadsheetAndGetSheet(url, sheetName) {
 }
 
 function appendARow(accountName, campaignName, adGroupName, adId, issues, suggestions) {
-  var sheet = openSpreadsheetAndGetSheet('', '');
+  var sheet = openSpreadsheetAndGetSheet('', 'Spelling Issues');
   sheet.appendRow([accountName, campaignName, adGroupName, adId, issues, suggestions]);
 }
 
-function sendSpellCheckReportEmail() {
-  var sheet = openSpreadsheetAndGetSheet('', '');
-  var cells = sheet.getDataRange().getValues();
-
+function sendSpellCheckReportEmail(emails) {
+  var sheet = openSpreadsheetAndGetSheet('', 'Spelling Issues');
   var uniqueIssuesCnt = countDistinctValues(sheet.getSheetValues(2, 5, sheet.getLastRow(), 1));
 
-  MailApp.sendEmail('',
+  for (var i = 0; i < emails.length; i++) {
+    MailApp.sendEmail(emails[i],
       'Bing Spell Checker - report',
-      Utilities.formatString('Spell check was successful!\n\nSpelling issues were logged here: ...\nNumber of unique issues: %s', uniqueIssuesCnt));
+      Utilities.formatString('Spell check was successful!\n\nSpelling issues were logged here: https://docs.google.com/spreadsheets/d/1r3B_sZhPySjd1GRnIooeRSmj8Bg6TJ5SDN0J0XwW_uE/\nNumber of unique issues: %s', uniqueIssuesCnt));
+  }
 }
 
 function countDistinctValues(values) {
